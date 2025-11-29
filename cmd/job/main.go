@@ -16,11 +16,13 @@ import (
 	"github.com/schraf/assistant/internal/telegraph"
 	"github.com/schraf/assistant/pkg/generators"
 	"github.com/schraf/assistant/pkg/models"
+	_ "github.com/schraf/research-assistant/pkg/generator"
 )
 
 func main() {
 	ctx := context.Background()
 	logger := log.NewLogger()
+	slog.SetDefault(logger)
 
 	if err := config.LoadEnv(".env"); err != nil {
 		logger.ErrorContext(ctx, "load_env_failed",
