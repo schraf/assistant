@@ -20,7 +20,7 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 		slog.String("request_id", requestId.String()),
 	)
 
-	logger.Info("received_research_request")
+	logger.Info("received_request")
 
 	//--==================================================================--
 	//--== DECODE THE REQUEST BODY

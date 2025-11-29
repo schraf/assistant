@@ -5,7 +5,6 @@ go 1.24.0
 require (
 	cloud.google.com/go/run v1.12.1
 	github.com/google/uuid v1.6.0
-	github.com/schraf/research-assistant v0.0.0-20251126141553-61a94d3ec5c6
 	google.golang.org/api v0.256.0
 	google.golang.org/genai v1.36.0
 )

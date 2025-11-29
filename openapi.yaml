@@ -1,0 +1,118 @@
+openapi: 3.0.3
+info:
+  title: ${API_ID}
+  description: |
+    An AI-powered assistant API that automatically conducts content creation, 
+    generates structured documents, publishes them to Telegraph, and sends email notifications.
+  version: 1.0.0
+  contact:
+    name: Assistant
+    url: https://github.com/schraf/assistant
+  license:
+    name: See LICENSE file
+    url: https://github.com/schraf/assistant/blob/main/LICENSE
+x-google-api-management:
+  backends:
+    cloudrun_backend:
+      address: ${CLOUD_RUN_SERVICE_URL}
+      disableAuth: true
+      pathTranslation: APPEND_PATH_TO_ADDRESS
+      protocol: "http/1.1"
+x-google-backend: cloudrun_backend
+security:
+  - google_api_key: []
+paths:
+  /:
+    post:
+      summary: Initiate an assistant job
+      description: |
+        Submits a content generation request. The request is queued for 
+        asynchronous processing. The process includes:
+        
+        1. Generation: Generates content based on request payload
+        4. Synthesis: Synthesizes content into a structured document
+        5. Publishing: Posts the document to Telegraph
+        6. Notification: Sends an email with the document URL
+        
+        The API returns immediately with a request ID. The actual generation is performed 
+        asynchronously by a backend worker.
+      operationId: generate
+      requestBody:
+        required: true
+        description: Request payload as a generic JSON object
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Request successfully queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+              example:
+                success: true
+                request_id: "550e8400-e29b-41d4-a716-446655440000"
+                message: "assistant request queued"
+        '400':
+          description: Bad request - missing or invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "missing or invalid request body"
+        '401':
+          description: Unauthorized - invalid or missing authentication token
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Unauthorized"
+        '500':
+          description: Internal server error - failed to queue job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "An internal error has occurred. (550e8400-e29b-41d4-a716-446655440000)"
+
+components:
+  securitySchemes:
+    google_api_key:
+      type: apiKey
+      name: x-api-key
+      in: header
+  schemas:
+    Response:
+      type: object
+      required:
+        - success
+        - request_id
+        - message
+      properties:
+        success:
+          type: boolean
+          description: Indicates whether the request was successfully queued
+          example: true
+        request_id:
+          type: string
+          format: uuid
+          description: Unique identifier for this request
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        message:
+          type: string
+          description: Human-readable status message
+          example: "assistant request queued"
+    
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+          example: "missing required query parameter: topic"
+    
