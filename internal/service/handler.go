@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 	"github.com/schraf/assistant/pkg/models"
 )
 
-func handleRequest(w http.ResponseWriter, r *http.Request) {
+func HandleRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	requestId := uuid.New()
 	logger := utils.NewLogger()

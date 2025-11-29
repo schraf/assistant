@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/schraf/assistant/internal/service"
 	"github.com/schraf/assistant/internal/utils"
 )
 
@@ -33,7 +34,7 @@ func main() {
 
 	address := fmt.Sprintf("%s:%s", hostname, port)
 
-	http.HandleFunc("/", handleRequest)
+	http.HandleFunc("/", service.HandleRequest)
 
 	logger.Info("starting_service",
 		slog.String("host", hostname),
