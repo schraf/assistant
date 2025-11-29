@@ -7,14 +7,15 @@ import (
 	"os"
 	"strings"
 
+	"github.com/schraf/assistant/internal/config"
+	"github.com/schraf/assistant/internal/log"
 	"github.com/schraf/assistant/internal/service"
-	"github.com/schraf/assistant/internal/utils"
 )
 
 func main() {
-	logger := utils.NewLogger()
+	logger := log.NewLogger()
 
-	if err := utils.LoadEnv(".env"); err != nil {
+	if err := config.LoadEnv(".env"); err != nil {
 		logger.Error("load_env_failed",
 			slog.String("error", err.Error()),
 		)

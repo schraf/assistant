@@ -6,14 +6,14 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/schraf/assistant/internal/utils"
+	"github.com/schraf/assistant/internal/log"
 	"github.com/schraf/assistant/pkg/models"
 )
 
 func HandleRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	requestId := uuid.New()
-	logger := utils.NewLogger()
+	logger := log.NewLogger()
 
 	logger = logger.With(
 		slog.String("request_id", requestId.String()),

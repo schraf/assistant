@@ -1,4 +1,4 @@
-package utils
+package log
 
 import (
 	"context"
@@ -17,11 +17,11 @@ type cloudLoggingHandler struct {
 func (h *cloudLoggingHandler) Handle(ctx context.Context, r slog.Record) error {
 	// Create a new record with the severity field
 	attrs := make([]slog.Attr, 0, r.NumAttrs()+1)
-	
+
 	// Map slog level to Cloud Logging severity
 	severity := levelToSeverity(r.Level)
 	attrs = append(attrs, slog.String("severity", severity))
-	
+
 	// Copy all other attributes, but skip the default "level" attribute
 	r.Attrs(func(a slog.Attr) bool {
 		if a.Key != "level" {
@@ -29,13 +29,13 @@ func (h *cloudLoggingHandler) Handle(ctx context.Context, r slog.Record) error {
 		}
 		return true
 	})
-	
+
 	// Create a new record with the modified attributes
 	newRecord := slog.NewRecord(r.Time, r.Level, r.Message, r.PC)
 	for _, attr := range attrs {
 		newRecord.AddAttrs(attr)
 	}
-	
+
 	return h.Handler.Handle(ctx, newRecord)
 }
 

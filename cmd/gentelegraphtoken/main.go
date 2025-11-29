@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/schraf/assistant/internal/config"
 	"github.com/schraf/assistant/internal/telegraph"
-	"github.com/schraf/assistant/internal/utils"
 )
 
 func main() {
-	if err := utils.LoadEnv(".env"); err != nil {
+	if err := config.LoadEnv(".env"); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
 		os.Exit(1)
 	}

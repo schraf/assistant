@@ -10,18 +10,19 @@ import (
 	"os"
 
 	"github.com/google/uuid"
+	"github.com/schraf/assistant/internal/config"
 	"github.com/schraf/assistant/internal/gemini"
+	"github.com/schraf/assistant/internal/log"
 	"github.com/schraf/assistant/internal/telegraph"
-	"github.com/schraf/assistant/internal/utils"
 	"github.com/schraf/assistant/pkg/generators"
 	"github.com/schraf/assistant/pkg/models"
 )
 
 func main() {
 	ctx := context.Background()
-	logger := utils.NewLogger()
+	logger := log.NewLogger()
 
-	if err := utils.LoadEnv(".env"); err != nil {
+	if err := config.LoadEnv(".env"); err != nil {
 		logger.ErrorContext(ctx, "load_env_failed",
 			slog.String("error", err.Error()),
 		)
