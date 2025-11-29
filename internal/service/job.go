@@ -13,7 +13,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-func startJob(ctx context.Context, contentType string, request models.ContentRequest) error {
+func startJob(ctx context.Context, contentType string, config map[string]any, request models.ContentRequest) error {
 	jobName := os.Getenv("CLOUD_RUN_JOB_NAME")
 	if jobName == "" {
 		return fmt.Errorf("CLOUD_RUN_JOB_NAME environment variable is not set")
@@ -41,6 +41,17 @@ func startJob(ctx context.Context, contentType string, request models.ContentReq
 	encodedRequestBody := base64.StdEncoding.EncodeToString(requestBodyJson)
 
 	//--==================================================================--
+	//--== ENCODE THE CONFIG
+	//--==================================================================--
+
+	configJson, err := json.Marshal(config)
+	if err != nil {
+		return fmt.Errorf("failed to marshal config: %w", err)
+	}
+
+	encodedConfig := base64.StdEncoding.EncodeToString(configJson)
+
+	//--==================================================================--
 	//--== REQUEST THE CLOUD RUN JOB
 	//--==================================================================--
 
@@ -64,6 +75,12 @@ func startJob(ctx context.Context, contentType string, request models.ContentReq
 							Name: "CONTENT_TYPE",
 							Values: &runpb.EnvVar_Value{
 								Value: contentType,
+							},
+						},
+						{
+							Name: "CONTENT_CONFIG",
+							Values: &runpb.EnvVar_Value{
+								Value: encodedConfig,
 							},
 						},
 						{

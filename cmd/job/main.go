@@ -66,7 +66,16 @@ func main() {
 
 	logger.InfoContext(ctx, "generating_content")
 
-	contentGenerator, err := getContentGenerator()
+	config, err := getConfig()
+	if err != nil {
+		logger.ErrorContext(ctx, "failed_getting_config",
+			slog.String("error", err.Error()),
+		)
+
+		os.Exit(1)
+	}
+
+	contentGenerator, err := getContentGenerator(*config)
 	if err != nil {
 		logger.ErrorContext(ctx, "failed_creating_generator",
 			slog.String("error", err.Error()),
@@ -113,6 +122,26 @@ func main() {
 	os.Exit(0)
 }
 
+func getConfig() (*generators.Config, error) {
+	encodedConfig := os.Getenv("CONTENT_CONFIG")
+	if encodedConfig == "" {
+		return &generators.Config{}, nil
+	}
+
+	configJson, err := base64.StdEncoding.DecodeString(encodedConfig)
+	if err != nil {
+		return nil, fmt.Errorf("invalid base64 config found in CONTENT_CONFIG: %w", err)
+	}
+
+	var config generators.Config
+
+	if err := json.Unmarshal(configJson, &config); err != nil {
+		return nil, fmt.Errorf("failed to parse json body in CONTENT_CONFIG: %w", err)
+	}
+
+	return &config, nil
+}
+
 func getRequest() (*models.ContentRequest, error) {
 	requestId, err := uuid.Parse(os.Getenv("REQUEST_ID"))
 	if err != nil {
@@ -126,7 +155,7 @@ func getRequest() (*models.ContentRequest, error) {
 
 	bodyJson, err := base64.StdEncoding.DecodeString(encodedBody)
 	if err != nil {
-		return nil, fmt.Errorf("invalid base64 request found froun in REQUEST_BODY: %w", err)
+		return nil, fmt.Errorf("invalid base64 request found in REQUEST_BODY: %w", err)
 	}
 
 	var body map[string]any
@@ -141,13 +170,13 @@ func getRequest() (*models.ContentRequest, error) {
 	}, nil
 }
 
-func getContentGenerator() (models.ContentGenerator, error) {
+func getContentGenerator(config generators.Config) (models.ContentGenerator, error) {
 	contentType := os.Getenv("CONTENT_TYPE")
 	if contentType == "" {
 		return nil, fmt.Errorf("no content type found in CONTENT_TYPE environment variable")
 	}
 
-	return generators.Create(contentType, nil)
+	return generators.Create(contentType, config)
 }
 
 func publishDocument(ctx context.Context, doc *models.Document) (*url.URL, error) {

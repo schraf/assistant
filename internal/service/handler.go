@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/schraf/assistant/internal/log"
@@ -54,6 +55,25 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 	)
 
 	//--==================================================================--
+	//--== BUILD CONFIG OBJECT
+	//--==================================================================--
+
+	configPrefix := "X-Config-"
+	config := make(map[string]any)
+
+	for name, values := range r.Header {
+		if strings.HasPrefix(name, configPrefix) {
+			key := name[len(configPrefix):]
+
+			if len(values) == 1 {
+				config[key] = values[0]
+			} else if len(values) > 1 {
+				config[key] = values
+			}
+		}
+	}
+
+	//--==================================================================--
 	//--== START THE CLOUD RUN JOB
 	//--==================================================================--
 
@@ -62,7 +82,7 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 		Body: body,
 	}
 
-	if err := startJob(ctx, contentType, req); err != nil {
+	if err := startJob(ctx, contentType, config, req); err != nil {
 		logger.WarnContext(ctx, "failed_executing_job",
 			slog.String("error", err.Error()),
 		)
