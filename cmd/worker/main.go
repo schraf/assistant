@@ -13,6 +13,7 @@ import (
 	"github.com/schraf/assistant/internal/gemini"
 	"github.com/schraf/assistant/internal/telegraph"
 	"github.com/schraf/assistant/internal/utils"
+	"github.com/schraf/assistant/pkg/generators"
 	"github.com/schraf/assistant/pkg/models"
 )
 
@@ -64,8 +65,16 @@ func main() {
 
 	logger.InfoContext(ctx, "generating_content")
 
-	/** TODO
-	doc, err := generator.Generate(ctx, *request, assistant)
+	contentGenerator, err := getContentGenerator()
+	if err != nil {
+		logger.ErrorContext(ctx, "failed_creating_generator",
+			slog.String("error", err.Error()),
+		)
+
+		os.Exit(1)
+	}
+
+	doc, err := contentGenerator.Generate(ctx, *request, assistant)
 	if err != nil {
 		logger.ErrorContext(ctx, "content_generation_error",
 			slog.String("error", err.Error()),
@@ -73,7 +82,6 @@ func main() {
 
 		os.Exit(1)
 	}
-	**/
 
 	logger.InfoContext(ctx, "generated_document",
 		slog.String("title", doc.Title),
@@ -130,6 +138,15 @@ func getRequest() (*models.ContentRequest, error) {
 		Id:   requestId,
 		Body: body,
 	}, nil
+}
+
+func getContentGenerator() (models.ContentGenerator, error) {
+	contentType := os.Getenv("CONTENT_TYPE")
+	if contentType == "" {
+		return nil, fmt.Errorf("no content type found in CONTENT_TYPE environment variable")
+	}
+
+	return generators.Create(contentType, nil)
 }
 
 func publishDocument(ctx context.Context, doc *models.Document) (*url.URL, error) {

@@ -13,7 +13,12 @@ import (
 	"google.golang.org/api/option"
 )
 
-func startJob(ctx context.Context, name string, request models.ContentRequest) error {
+func startJob(ctx context.Context, contentType string, request models.ContentRequest) error {
+	jobName := os.Getenv("CLOUD_RUN_JOB_NAME")
+	if jobName == "" {
+		return fmt.Errorf("CLOUD_RUN_JOB_NAME environment variable is not set")
+	}
+
 	region := os.Getenv("CLOUD_RUN_JOB_REGION")
 	if region == "" {
 		return fmt.Errorf("CLOUD_RUN_JOB_REGION environment variable is not set")
@@ -46,7 +51,7 @@ func startJob(ctx context.Context, name string, request models.ContentRequest) e
 	defer client.Close()
 
 	// Build the job execution request
-	jobPath := fmt.Sprintf("projects/%s/locations/%s/jobs/%s", projectId, region, name)
+	jobPath := fmt.Sprintf("projects/%s/locations/%s/jobs/%s", projectId, region, jobName)
 
 	// Execute the job with the request in an environment variable
 	jobRequest := &runpb.RunJobRequest{
@@ -55,6 +60,12 @@ func startJob(ctx context.Context, name string, request models.ContentRequest) e
 			ContainerOverrides: []*runpb.RunJobRequest_Overrides_ContainerOverride{
 				{
 					Env: []*runpb.EnvVar{
+						{
+							Name: "CONTENT_TYPE",
+							Values: &runpb.EnvVar_Value{
+								Value: contentType,
+							},
+						},
 						{
 							Name: "REQUEST_ID",
 							Values: &runpb.EnvVar_Value{

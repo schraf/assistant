@@ -37,20 +37,20 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//--==================================================================--
-	//--== DETERMINE JOB TYPE
+	//--== DETERMINE CONTENT TYPE
 	//--==================================================================--
 
-	jobName := r.Header.Get("X-Job-Name")
+	contentType := r.Header.Get("X-Content-Type")
 
-	if jobName == "" {
-		logger.WarnContext(ctx, "missing X-Job-Name header")
+	if contentType == "" {
+		logger.WarnContext(ctx, "missing X-Content-Type header")
 
-		http.Error(w, "missing X-Job-Name header", http.StatusBadRequest)
+		http.Error(w, "missing X-Content-Type header", http.StatusBadRequest)
 		return
 	}
 
-	logger.InfoContext(ctx, "request_job",
-		slog.String("job_name", jobName),
+	logger.InfoContext(ctx, "request_content",
+		slog.String("content_type", contentType),
 	)
 
 	//--==================================================================--
@@ -62,9 +62,8 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		Body: body,
 	}
 
-	if err := startJob(ctx, jobName, req); err != nil {
+	if err := startJob(ctx, contentType, req); err != nil {
 		logger.WarnContext(ctx, "failed_executing_job",
-			slog.String("job_name", jobName),
 			slog.String("error", err.Error()),
 		)
 
@@ -79,7 +78,6 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	response := map[string]interface{}{
 		"success":    true,
 		"request_id": requestId,
-		"job_name":   jobName,
 		"message":    "assistant request queued",
 	}
 
