@@ -54,7 +54,7 @@ steps:
       - '--command'
       - '/job'
       - '--max-retries'
-      - '2'
+      - '0'
       - '--task-timeout'
       - '3600'
       - '--cpu'
