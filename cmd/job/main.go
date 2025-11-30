@@ -13,6 +13,7 @@ import (
 	"github.com/schraf/assistant/internal/config"
 	"github.com/schraf/assistant/internal/gemini"
 	"github.com/schraf/assistant/internal/log"
+	"github.com/schraf/assistant/internal/notify"
 	"github.com/schraf/assistant/internal/telegraph"
 	"github.com/schraf/assistant/pkg/generators"
 	"github.com/schraf/assistant/pkg/models"
@@ -139,6 +140,22 @@ func main() {
 	logger.InfoContext(ctx, "published_document",
 		slog.String("url", url.String()),
 	)
+
+	//--========================================================================--
+	//--== SEND NOTIFICATION
+	//--========================================================================--
+
+	logger.InfoContext(ctx, "sending_notification")
+
+	if err := notify.SendPublishedURLNotification(url, doc.Title); err != nil {
+		logger.ErrorContext(ctx, "failed_sending_notification",
+			slog.String("error", err.Error()),
+		)
+
+		os.Exit(1)
+	}
+
+	logger.InfoContext(ctx, "notification_sent")
 
 	logger.InfoContext(ctx, "job_completed_successfully")
 	os.Exit(0)
