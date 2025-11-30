@@ -9,6 +9,12 @@ variable "region" {
   default     = "us-central1"
 }
 
+variable "api_token" {
+  description = "API token for assistant service"
+  type        = string
+  sensitive   = true
+}
+
 variable "google_api_key" {
   description = "API key for accessing Google Gemini"
   type        = string
@@ -25,18 +31,6 @@ variable "telegraph_author_name" {
   description = "Author name for Telegraph articles"
   type        = string
   default     = ""
-}
-
-variable "auth_secret" {
-  description = "Secret key for generating and validating auth tokens"
-  type        = string
-  sensitive   = true
-}
-
-variable "auth_token_messages" {
-  description = "Comma-separated list of messages that can be used to generate valid auth tokens"
-  type        = string
-  sensitive   = true
 }
 
 variable "smtp_hostname" {

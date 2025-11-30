@@ -35,7 +35,7 @@ func main() {
 
 	address := fmt.Sprintf("%s:%s", hostname, port)
 
-	http.HandleFunc("/", service.HandleRequest)
+	http.HandleFunc("/content", service.HandleRequest)
 
 	logger.Info("starting_service",
 		slog.String("host", hostname),

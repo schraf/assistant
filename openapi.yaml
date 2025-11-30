@@ -22,9 +22,9 @@ x-google-backend: cloudrun_backend
 security:
   - google_api_key: []
 paths:
-  /:
+  /content:
     post:
-      summary: Initiate an assistant job
+      summary: Initiate an assistant job to generate content
       description: |
         Submits a content generation request. The request is queued for 
         asynchronous processing. The process includes:
@@ -36,7 +36,7 @@ paths:
         
         The API returns immediately with a request ID. The actual generation is performed 
         asynchronously by a backend worker.
-      operationId: generate
+      operationId: content
       requestBody:
         required: true
         description: Request payload as a generic JSON object

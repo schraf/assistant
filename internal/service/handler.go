@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/google/uuid"
@@ -21,6 +22,36 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 	)
 
 	logger.Info("received_request")
+
+	//--==================================================================--
+	//--== AUTHENTICATE THE REQUEST
+	//--==================================================================--
+
+	apiToken := os.Getenv("API_TOKEN")
+	if apiToken == "" {
+		logger.WarnContext(ctx, "no_api_token")
+
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	requestToken := r.Header.Get("X-API-Token")
+
+	if requestToken == "" {
+		logger.WarnContext(ctx, "missing X-API-Token header")
+
+		http.Error(w, "missing X-API-Token header", http.StatusBadRequest)
+		return
+	}
+
+	if requestToken != apiToken {
+		logger.WarnContext(ctx, "invalid_api_token",
+			slog.String("request_token", requestToken),
+		)
+
+		http.Error(w, "invalid api token", http.StatusUnauthorized)
+		return
+	}
 
 	//--==================================================================--
 	//--== DECODE THE REQUEST BODY

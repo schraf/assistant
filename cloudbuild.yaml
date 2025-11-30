@@ -30,8 +30,6 @@ steps:
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO_NAME}/assistant:${_TAG}'
       - '--region'
       - '${_REGION}'
-      - '--command'
-      - '/service'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'

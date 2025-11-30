@@ -38,6 +38,10 @@ terraform-init:
 	@echo "Initializing Terraform..."
 	cd terraform && terraform init
 
+terraform-refresh:
+	@echo "Refreshing Terraform state..."
+	cd terraform && terraform refresh
+
 terraform-plan:
 	@echo "Planning Terraform changes..."
 	cd terraform && terraform plan
@@ -94,6 +98,7 @@ help:
 	@echo ""
 	@echo "Terraform targets:"
 	@echo "  terraform-init      - Initialize Terraform"
+	@echo "  terraform-refresh   - Refreshes the Terraform state"
 	@echo "  terraform-plan      - Plan Terraform changes"
 	@echo "  terraform-apply     - Apply Terraform changes (use after initial setup)"
 	@echo "  terraform-bootstrap - Apply Terraform with placeholder image (first apply only)"

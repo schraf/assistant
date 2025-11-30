@@ -12,26 +12,6 @@ resource "google_project_iam_member" "assistant_aiplatform" {
   member  = "serviceAccount:${google_service_account.assistant.email}"
 }
 
-# Grant Cloud Build service account permission to push images to Artifact Registry
-data "google_project" "project" {
-  project_id = var.project_id
-}
-
-resource "google_artifact_registry_repository_iam_member" "cloudbuild_writer" {
-  location   = var.region
-  repository = google_artifact_registry_repository.assistant_repo.repository_id
-  role       = "roles/artifactregistry.writer"
-  member     = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
-}
-
-# Grant Cloud Build service account permission to deploy to Cloud Run
-# Note: This uses project-level IAM to avoid circular dependencies
-resource "google_project_iam_member" "cloudbuild_run_admin" {
-  project = var.project_id
-  role    = "roles/run.admin"
-  member  = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
-}
-
 # Grant the service account permission to execute Cloud Run Jobs
 # Note: run.jobsExecutor allows executing jobs, but we also need run.admin or run.developer
 # to use RunJob API with overrides
@@ -47,12 +27,5 @@ resource "google_project_iam_member" "assistant_run_developer" {
   project = var.project_id
   role    = "roles/run.developer"
   member  = "serviceAccount:${google_service_account.assistant.email}"
-}
-
-# Create service account for API Gateway
-resource "google_service_account" "api_gateway" {
-  account_id   = "api-gateway"
-  display_name = "API Gateway Service Account"
-  description  = "Service account for API Gateway to invoke Cloud Run service"
 }
 

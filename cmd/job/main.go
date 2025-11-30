@@ -50,6 +50,19 @@ func main() {
 	)
 
 	//--========================================================================--
+	//--== GET THE CONFIG
+	//--========================================================================--
+
+	config, err := getConfig()
+	if err != nil {
+		logger.ErrorContext(ctx, "failed_getting_config",
+			slog.String("error", err.Error()),
+		)
+
+		os.Exit(1)
+	}
+
+	//--========================================================================--
 	//--== CREATE THE ASSISTANT
 	//--========================================================================--
 
@@ -62,20 +75,27 @@ func main() {
 		os.Exit(1)
 	}
 
+	if model, ok := (*config)["model"].(string); ok {
+		if model == "pro" {
+			ctx = gemini.WithProModel(ctx)
+
+			logger.InfoContext(ctx, "using_model",
+				slog.String("model", "pro"),
+			)
+		} else if model == "basic" {
+			ctx = gemini.WithFlashModel(ctx)
+
+			logger.InfoContext(ctx, "using_model",
+				slog.String("model", "basic"),
+			)
+		}
+	}
+
 	//--========================================================================--
 	//--== GENERATE CONTENT
 	//--========================================================================--
 
 	logger.InfoContext(ctx, "generating_content")
-
-	config, err := getConfig()
-	if err != nil {
-		logger.ErrorContext(ctx, "failed_getting_config",
-			slog.String("error", err.Error()),
-		)
-
-		os.Exit(1)
-	}
 
 	contentGenerator, err := getContentGenerator(*config)
 	if err != nil {
