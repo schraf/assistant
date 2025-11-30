@@ -50,6 +50,10 @@ func main() {
 		slog.String("request_id", request.Id.String()),
 	)
 
+	logger.InfoContext(ctx, "request_body",
+		slog.Any("body", request.Body),
+	)
+
 	//--========================================================================--
 	//--== GET THE CONFIG
 	//--========================================================================--
