@@ -53,6 +53,8 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.Info("authenticated_request")
+
 	//--==================================================================--
 	//--== DECODE THE REQUEST BODY
 	//--==================================================================--
