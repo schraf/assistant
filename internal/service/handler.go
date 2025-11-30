@@ -56,21 +56,6 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 	logger.Info("authenticated_request")
 
 	//--==================================================================--
-	//--== DECODE THE REQUEST BODY
-	//--==================================================================--
-
-	var body map[string]any
-
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		logger.WarnContext(ctx, "invalid_json_payload",
-			slog.String("error", err.Error()),
-		)
-
-		http.Error(w, "invalid JSON payload", http.StatusBadRequest)
-		return
-	}
-
-	//--==================================================================--
 	//--== DETERMINE CONTENT TYPE
 	//--==================================================================--
 
@@ -103,8 +88,32 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 			} else if len(values) > 1 {
 				config[key] = values
 			}
+
+			logger.InfoContext(ctx, "config_variable",
+				slog.String("key", key),
+				slog.Any("value", config[key]),
+			)
 		}
 	}
+
+	//--==================================================================--
+	//--== DECODE THE REQUEST BODY
+	//--==================================================================--
+
+	var body map[string]any
+
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		logger.WarnContext(ctx, "invalid_json_payload",
+			slog.String("error", err.Error()),
+		)
+
+		http.Error(w, "invalid JSON payload", http.StatusBadRequest)
+		return
+	}
+
+	logger.InfoContext(ctx, "request_body",
+		slog.Any("body", body),
+	)
 
 	//--==================================================================--
 	//--== START THE CLOUD RUN JOB
