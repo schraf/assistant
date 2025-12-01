@@ -5,7 +5,8 @@ go 1.24.0
 require (
 	cloud.google.com/go/run v1.12.1
 	github.com/google/uuid v1.6.0
-	github.com/schraf/research-assistant v1.0.2
+	github.com/schraf/research-assistant v1.0.3
+	github.com/stretchr/testify v1.11.1
 	google.golang.org/api v0.256.0
 	google.golang.org/genai v1.36.0
 )
@@ -27,7 +28,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/testify v1.11.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.61.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.61.0 // indirect
