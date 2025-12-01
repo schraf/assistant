@@ -3,14 +3,29 @@ package eval
 import (
 	"context"
 	"fmt"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/schraf/assistant/internal/gemini"
+	"github.com/schraf/assistant/internal/ollama"
 	"github.com/schraf/assistant/pkg/models"
 )
 
+func newAssistant(ctx context.Context) (models.Assistant, error) {
+	provider := strings.ToLower(os.Getenv("ASSISTANT_PROVIDER"))
+	switch provider {
+	case "ollama":
+		return ollama.NewClient(ctx)
+	case "gemini", "":
+		return gemini.NewClient(ctx)
+	default:
+		return nil, fmt.Errorf("unknown assistant provider: %s", provider)
+	}
+}
+
 func Evaluate(ctx context.Context, generator models.ContentGenerator, request models.ContentRequest) error {
-	assistant, err := gemini.NewClient(ctx)
+	assistant, err := newAssistant(ctx)
 	if err != nil {
 		return fmt.Errorf("failed creating assistant client: %w", err)
 	}

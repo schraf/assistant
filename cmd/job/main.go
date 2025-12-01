@@ -81,19 +81,24 @@ func main() {
 	}
 
 	if model, ok := (*config)["model"].(string); ok {
+		var modelName string
 		if model == "pro" {
-			ctx = gemini.WithProModel(ctx)
-
-			logger.InfoContext(ctx, "using_model",
-				slog.String("model", "pro"),
-			)
+			modelName = "gemini-pro-latest"
 		} else if model == "basic" {
-			ctx = gemini.WithFlashModel(ctx)
-
-			logger.InfoContext(ctx, "using_model",
-				slog.String("model", "basic"),
+			modelName = "gemini-flash-latest"
+		} else {
+			logger.ErrorContext(ctx, "invalid_model_name",
+				slog.String("model", model),
 			)
+
+			os.Exit(1)
 		}
+
+		ctx = gemini.WithModel(ctx, modelName)
+
+		logger.InfoContext(ctx, "using_model",
+			slog.String("model", modelName),
+		)
 	}
 
 	//--========================================================================--
