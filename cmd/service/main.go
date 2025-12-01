@@ -35,7 +35,12 @@ func main() {
 
 	address := fmt.Sprintf("%s:%s", hostname, port)
 
-	http.HandleFunc("/content", service.HandleRequest)
+	// Create job scheduler
+	scheduler := service.NewCloudRunJobScheduler()
+
+	// Create handler with scheduler
+	handler := service.NewHandler(scheduler)
+	http.HandleFunc("/content", handler.HandleRequest)
 
 	logger.Info("starting_service",
 		slog.String("host", hostname),

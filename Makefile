@@ -23,7 +23,7 @@ fmt:
 
 test:
 	@echo "Running tests..."
-	go test -v ./...
+	go test ./internal/test/...
 
 clean:
 	@echo "Cleaning build artifacts..."

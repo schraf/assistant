@@ -71,3 +71,8 @@ func (c *Client) StructuredAsk(ctx context.Context, persona string, request stri
 
 	return responseJson, nil
 }
+
+// WithModel returns a context with the specified model set.
+func (c *Client) WithModel(ctx context.Context, model string) context.Context {
+	return context.WithValue(ctx, modelKey, model)
+}

@@ -8,16 +8,30 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/schraf/assistant/internal/interfaces"
 	"github.com/schraf/assistant/internal/log"
 	"github.com/schraf/assistant/pkg/models"
 )
 
-func HandleRequest(w http.ResponseWriter, r *http.Request) {
+// Handler handles HTTP requests for the assistant service.
+type Handler struct {
+	scheduler interfaces.JobScheduler
+	logger    *slog.Logger
+}
+
+// NewHandler creates a new Handler with the given JobScheduler.
+func NewHandler(scheduler interfaces.JobScheduler) *Handler {
+	return &Handler{
+		scheduler: scheduler,
+		logger:    log.NewLogger(),
+	}
+}
+
+// HandleRequest handles HTTP requests for content generation.
+func (h *Handler) HandleRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	requestId := uuid.New()
-	logger := log.NewLogger()
-
-	logger = logger.With(
+	logger := h.logger.With(
 		slog.String("request_id", requestId.String()),
 	)
 
@@ -124,7 +138,7 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 		Body: body,
 	}
 
-	if err := startJob(ctx, contentType, config, req); err != nil {
+	if err := h.scheduler.ScheduleJob(ctx, contentType, config, req); err != nil {
 		logger.WarnContext(ctx, "failed_executing_job",
 			slog.String("error", err.Error()),
 		)

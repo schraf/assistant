@@ -5,11 +5,21 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+
+	"github.com/schraf/assistant/internal/interfaces"
 )
+
+// EmailNotifier implements interfaces.Notifier using SMTP email.
+type EmailNotifier struct{}
+
+// NewEmailNotifier creates a new EmailNotifier.
+func NewEmailNotifier() interfaces.Notifier {
+	return &EmailNotifier{}
+}
 
 // SendPublishedURLNotification sends an email notification with the published URL
 // using environment variables defined in terraform/job.tf
-func SendPublishedURLNotification(publishedURL *url.URL, title string) error {
+func (n *EmailNotifier) SendPublishedURLNotification(publishedURL *url.URL, title string) error {
 	host := os.Getenv("MAIL_SMTP_SERVER")
 	if host == "" {
 		return fmt.Errorf("missing MAIL_SMTP_SERVER environment variable")

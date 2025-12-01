@@ -2,21 +2,15 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
-	"fmt"
 	"log/slog"
-	"net/url"
 	"os"
 
-	"github.com/google/uuid"
 	"github.com/schraf/assistant/internal/config"
 	"github.com/schraf/assistant/internal/gemini"
+	"github.com/schraf/assistant/internal/job"
 	"github.com/schraf/assistant/internal/log"
 	"github.com/schraf/assistant/internal/notify"
 	"github.com/schraf/assistant/internal/telegraph"
-	"github.com/schraf/assistant/pkg/generators"
-	"github.com/schraf/assistant/pkg/models"
 	_ "github.com/schraf/research-assistant/pkg/generator"
 )
 
@@ -29,251 +23,32 @@ func main() {
 		logger.ErrorContext(ctx, "load_env_failed",
 			slog.String("error", err.Error()),
 		)
-
 		os.Exit(1)
 	}
 
-	//--========================================================================--
-	//--== GET THE REQUEST
-	//--========================================================================--
-
-	request, err := getRequest()
-	if err != nil {
-		logger.ErrorContext(ctx, "invalid_request",
-			slog.String("error", err.Error()),
-		)
-
-		os.Exit(1)
-	}
-
-	logger = logger.With(
-		slog.String("request_id", request.Id.String()),
-	)
-
-	logger.InfoContext(ctx, "request_body",
-		slog.Any("body", request.Body),
-	)
-
-	//--========================================================================--
-	//--== GET THE CONFIG
-	//--========================================================================--
-
-	config, err := getConfig()
-	if err != nil {
-		logger.ErrorContext(ctx, "failed_getting_config",
-			slog.String("error", err.Error()),
-		)
-
-		os.Exit(1)
-	}
-
-	//--========================================================================--
-	//--== CREATE THE ASSISTANT
-	//--========================================================================--
-
+	// Create assistant
 	assistant, err := gemini.NewClient(ctx)
 	if err != nil {
 		logger.ErrorContext(ctx, "failed_creating_assistant",
 			slog.String("error", err.Error()),
 		)
-
 		os.Exit(1)
 	}
 
-	if model, ok := (*config)["model"].(string); ok {
-		var modelName string
-		if model == "pro" {
-			modelName = "gemini-pro-latest"
-		} else if model == "basic" {
-			modelName = "gemini-flash-latest"
-		} else {
-			logger.ErrorContext(ctx, "invalid_model_name",
-				slog.String("model", model),
-			)
+	// Create dependencies
+	publisher := telegraph.NewPublisher()
+	notifier := notify.NewEmailNotifier()
 
-			os.Exit(1)
-		}
+	// Create processor
+	processor := job.NewProcessor(assistant, publisher, notifier, logger)
 
-		ctx = gemini.WithModel(ctx, modelName)
-
-		logger.InfoContext(ctx, "using_model",
-			slog.String("model", modelName),
-		)
-	}
-
-	//--========================================================================--
-	//--== GENERATE CONTENT
-	//--========================================================================--
-
-	logger.InfoContext(ctx, "generating_content")
-
-	contentGenerator, err := getContentGenerator(*config)
-	if err != nil {
-		logger.ErrorContext(ctx, "failed_creating_generator",
+	// Process the job
+	if err := processor.Process(ctx); err != nil {
+		logger.ErrorContext(ctx, "job_failed",
 			slog.String("error", err.Error()),
 		)
-
 		os.Exit(1)
 	}
 
-	doc, err := contentGenerator.Generate(ctx, *request, assistant)
-	if err != nil {
-		logger.ErrorContext(ctx, "content_generation_error",
-			slog.String("error", err.Error()),
-		)
-
-		os.Exit(1)
-	}
-
-	logger.InfoContext(ctx, "generated_document",
-		slog.String("title", doc.Title),
-		slog.String("author", doc.Author),
-		slog.Int("section_count", len(doc.Sections)),
-	)
-
-	//--========================================================================--
-	//--== PUBLISH CONTENT
-	//--========================================================================--
-
-	logger.InfoContext(ctx, "publishing_document")
-
-	url, err := publishDocument(ctx, doc)
-	if err != nil {
-		logger.ErrorContext(ctx, "publish_error",
-			slog.String("error", err.Error()),
-		)
-
-		os.Exit(1)
-	}
-
-	logger.InfoContext(ctx, "published_document",
-		slog.String("url", url.String()),
-	)
-
-	//--========================================================================--
-	//--== SEND NOTIFICATION
-	//--========================================================================--
-
-	logger.InfoContext(ctx, "sending_notification")
-
-	if err := notify.SendPublishedURLNotification(url, doc.Title); err != nil {
-		logger.ErrorContext(ctx, "failed_sending_notification",
-			slog.String("error", err.Error()),
-		)
-
-		os.Exit(1)
-	}
-
-	logger.InfoContext(ctx, "notification_sent")
-
-	logger.InfoContext(ctx, "job_completed_successfully")
 	os.Exit(0)
-}
-
-func getConfig() (*generators.Config, error) {
-	encodedConfig := os.Getenv("CONTENT_CONFIG")
-	if encodedConfig == "" {
-		return &generators.Config{}, nil
-	}
-
-	configJson, err := base64.StdEncoding.DecodeString(encodedConfig)
-	if err != nil {
-		return nil, fmt.Errorf("invalid base64 config found in CONTENT_CONFIG: %w", err)
-	}
-
-	var config generators.Config
-
-	if err := json.Unmarshal(configJson, &config); err != nil {
-		return nil, fmt.Errorf("failed to parse json body in CONTENT_CONFIG: %w", err)
-	}
-
-	return &config, nil
-}
-
-func getRequest() (*models.ContentRequest, error) {
-	requestId, err := uuid.Parse(os.Getenv("REQUEST_ID"))
-	if err != nil {
-		return nil, err
-	}
-
-	encodedBody := os.Getenv("REQUEST_BODY")
-	if encodedBody == "" {
-		return nil, fmt.Errorf("no request body found in REQUEST_BODY environment variable")
-	}
-
-	bodyJson, err := base64.StdEncoding.DecodeString(encodedBody)
-	if err != nil {
-		return nil, fmt.Errorf("invalid base64 request found in REQUEST_BODY: %w", err)
-	}
-
-	var body map[string]any
-
-	if err := json.Unmarshal(bodyJson, &body); err != nil {
-		return nil, fmt.Errorf("failed to parse json body in REQUEST_BODY: %w", err)
-	}
-
-	return &models.ContentRequest{
-		Id:   requestId,
-		Body: body,
-	}, nil
-}
-
-func getContentGenerator(config generators.Config) (models.ContentGenerator, error) {
-	contentType := os.Getenv("CONTENT_TYPE")
-	if contentType == "" {
-		return nil, fmt.Errorf("no content type found in CONTENT_TYPE environment variable")
-	}
-
-	return generators.Create(contentType, config)
-}
-
-func publishDocument(ctx context.Context, doc *models.Document) (*url.URL, error) {
-	apiToken := os.Getenv("TELEGRAPH_API_KEY")
-	if apiToken == "" {
-		return nil, fmt.Errorf("missing TELEGRAPH_API_TOKEN environment variable")
-	}
-
-	publisher := telegraph.NewDefaultClient()
-
-	content := telegraph.Nodes{}
-
-	for _, section := range doc.Sections {
-		content = append(content, telegraph.NodeElement{
-			Tag: "h3",
-			Children: telegraph.Nodes{
-				section.Title,
-			},
-		})
-
-		for _, paragraph := range section.Paragraphs {
-			content = append(content, telegraph.NodeElement{
-				Tag: "p",
-				Children: telegraph.Nodes{
-					paragraph,
-				},
-			})
-		}
-	}
-
-	returnContent := false
-
-	pageRequest := telegraph.CreatePageRequest{
-		AccessToken:   apiToken,
-		Title:         doc.Title,
-		AuthorName:    &doc.Author,
-		Content:       content,
-		ReturnContent: &returnContent,
-	}
-
-	page, err := publisher.CreatePage(ctx, pageRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	pageURL, err := url.Parse(page.URL)
-	if err != nil {
-		return nil, err
-	}
-
-	return pageURL, nil
 }
