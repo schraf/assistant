@@ -8,19 +8,19 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/schraf/assistant/internal/interfaces"
 	"github.com/schraf/assistant/internal/log"
+	internal_models "github.com/schraf/assistant/internal/models"
 	"github.com/schraf/assistant/pkg/models"
 )
 
 // Handler handles HTTP requests for the assistant service.
 type Handler struct {
-	scheduler interfaces.JobScheduler
+	scheduler internal_models.JobScheduler
 	logger    *slog.Logger
 }
 
 // NewHandler creates a new Handler with the given JobScheduler.
-func NewHandler(scheduler interfaces.JobScheduler) *Handler {
+func NewHandler(scheduler internal_models.JobScheduler) *Handler {
 	return &Handler{
 		scheduler: scheduler,
 		logger:    log.NewLogger(),

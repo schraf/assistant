@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/schraf/assistant/internal/gemini"
+	"github.com/schraf/assistant/internal/mocks"
 	"github.com/schraf/assistant/internal/ollama"
 	"github.com/schraf/assistant/pkg/models"
 )
@@ -15,6 +16,8 @@ import (
 func newAssistant(ctx context.Context) (models.Assistant, error) {
 	provider := strings.ToLower(os.Getenv("ASSISTANT_PROVIDER"))
 	switch provider {
+	case "mock":
+		return &mocks.MockAssistant{}, nil
 	case "ollama":
 		return ollama.NewClient(ctx)
 	case "gemini", "":

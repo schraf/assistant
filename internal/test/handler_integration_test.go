@@ -10,10 +10,11 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/schraf/assistant/internal/mocks"
 	"github.com/schraf/assistant/internal/service"
 	"github.com/schraf/assistant/pkg/models"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHandler_Integration(t *testing.T) {
@@ -23,7 +24,7 @@ func TestHandler_Integration(t *testing.T) {
 	defer os.Unsetenv("API_TOKEN")
 
 	// Create mock scheduler
-	mockScheduler := &MockJobScheduler{
+	mockScheduler := &mocks.MockJobScheduler{
 		ScheduleJobFunc: func(ctx context.Context, contentType string, config map[string]any, request models.ContentRequest) error {
 			// Verify the job was called with correct parameters
 			assert.Equal(t, "article", contentType, "contentType should be 'article'")
@@ -72,7 +73,7 @@ func TestHandler_Integration_MissingToken(t *testing.T) {
 	os.Setenv("API_TOKEN", "test-token")
 	defer os.Unsetenv("API_TOKEN")
 
-	mockScheduler := &MockJobScheduler{}
+	mockScheduler := &mocks.MockJobScheduler{}
 	handler := service.NewHandler(mockScheduler)
 
 	req := httptest.NewRequest("POST", "/content", bytes.NewReader([]byte("{}")))
@@ -88,7 +89,7 @@ func TestHandler_Integration_InvalidToken(t *testing.T) {
 	os.Setenv("API_TOKEN", "correct-token")
 	defer os.Unsetenv("API_TOKEN")
 
-	mockScheduler := &MockJobScheduler{}
+	mockScheduler := &mocks.MockJobScheduler{}
 	handler := service.NewHandler(mockScheduler)
 
 	req := httptest.NewRequest("POST", "/content", bytes.NewReader([]byte("{}")))
@@ -105,7 +106,7 @@ func TestHandler_Integration_MissingContentType(t *testing.T) {
 	os.Setenv("API_TOKEN", "test-token")
 	defer os.Unsetenv("API_TOKEN")
 
-	mockScheduler := &MockJobScheduler{}
+	mockScheduler := &mocks.MockJobScheduler{}
 	handler := service.NewHandler(mockScheduler)
 
 	req := httptest.NewRequest("POST", "/content", bytes.NewReader([]byte("{}")))
@@ -122,7 +123,7 @@ func TestHandler_Integration_InvalidJSON(t *testing.T) {
 	os.Setenv("API_TOKEN", "test-token")
 	defer os.Unsetenv("API_TOKEN")
 
-	mockScheduler := &MockJobScheduler{}
+	mockScheduler := &mocks.MockJobScheduler{}
 	handler := service.NewHandler(mockScheduler)
 
 	req := httptest.NewRequest("POST", "/content", bytes.NewReader([]byte("invalid json")))
@@ -139,7 +140,7 @@ func TestHandler_Integration_SchedulerError(t *testing.T) {
 	os.Setenv("API_TOKEN", "test-token")
 	defer os.Unsetenv("API_TOKEN")
 
-	mockScheduler := &MockJobScheduler{
+	mockScheduler := &mocks.MockJobScheduler{
 		ScheduleJobFunc: func(ctx context.Context, contentType string, config map[string]any, request models.ContentRequest) error {
 			return http.ErrBodyReadAfterClose
 		},

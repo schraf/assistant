@@ -7,10 +7,11 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/schraf/assistant/internal/mocks"
 	"github.com/schraf/assistant/pkg/eval"
 	"github.com/schraf/assistant/pkg/models"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEvaluate_Integration(t *testing.T) {
@@ -37,7 +38,7 @@ func TestEvaluate_Integration(t *testing.T) {
 	var capturedAssistant models.Assistant
 
 	// Create mock generator
-	generator := &MockContentGenerator{
+	generator := &mocks.MockContentGenerator{
 		GenerateFunc: func(ctx context.Context, req models.ContentRequest, assistant models.Assistant) (*models.Document, error) {
 			capturedRequest = req
 			capturedAssistant = assistant
@@ -100,7 +101,7 @@ func TestEvaluate_Integration_ModelParameter(t *testing.T) {
 		Body: map[string]any{"topic": "Testing"},
 	}
 
-	generator := &MockContentGenerator{
+	generator := &mocks.MockContentGenerator{
 		GenerateFunc: func(ctx context.Context, req models.ContentRequest, assistant models.Assistant) (*models.Document, error) {
 			return &models.Document{
 				Title:  "Model Test",
@@ -145,7 +146,7 @@ func TestEvaluate_Integration_UnknownProvider(t *testing.T) {
 		Body: map[string]any{"topic": "Test"},
 	}
 
-	generator := &MockContentGenerator{}
+	generator := &mocks.MockContentGenerator{}
 
 	ctx := context.Background()
 	model := "test-model"
@@ -175,7 +176,7 @@ func TestEvaluate_Integration_GeneratorError(t *testing.T) {
 		Body: map[string]any{"topic": "Test"},
 	}
 
-	generator := &MockContentGenerator{
+	generator := &mocks.MockContentGenerator{
 		GenerateFunc: func(ctx context.Context, req models.ContentRequest, assistant models.Assistant) (*models.Document, error) {
 			return nil, assert.AnError
 		},

@@ -9,11 +9,12 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"github.com/schraf/assistant/internal/job"
 	"github.com/schraf/assistant/internal/log"
+	"github.com/schraf/assistant/internal/mocks"
 	"github.com/schraf/assistant/pkg/models"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestProcessor_Integration(t *testing.T) {
@@ -39,7 +40,7 @@ func TestProcessor_Integration(t *testing.T) {
 	}()
 
 	// Create mocks
-	mockAssistant := &MockAssistant{
+	mockAssistant := &mocks.MockAssistant{
 		WithModelFunc: func(ctx context.Context, model string) context.Context {
 			assert.Equal(t, "gemini-pro-latest", model, "model should be 'gemini-pro-latest'")
 			return ctx
@@ -52,7 +53,7 @@ func TestProcessor_Integration(t *testing.T) {
 
 	var publishedDoc *models.Document
 
-	mockPublisher := &MockPublisher{
+	mockPublisher := &mocks.MockPublisher{
 		PublishDocumentFunc: func(ctx context.Context, doc *models.Document) (*url.URL, error) {
 			publishedDoc = doc
 			url, err := url.Parse("https://telegra.ph/test-page")
@@ -66,7 +67,7 @@ func TestProcessor_Integration(t *testing.T) {
 	var notifiedURL *url.URL
 	var notifiedTitle string
 
-	mockNotifier := &MockNotifier{
+	mockNotifier := &mocks.MockNotifier{
 		SendPublishedURLNotificationFunc: func(publishedURL *url.URL, title string) error {
 			notifiedURL = publishedURL
 			notifiedTitle = title
@@ -120,7 +121,7 @@ func TestProcessor_Integration_ModelSelection(t *testing.T) {
 	}()
 
 	var selectedModel string
-	mockAssistant := &MockAssistant{
+	mockAssistant := &mocks.MockAssistant{
 		WithModelFunc: func(ctx context.Context, model string) context.Context {
 			selectedModel = model
 			return ctx
@@ -131,8 +132,8 @@ func TestProcessor_Integration_ModelSelection(t *testing.T) {
 		},
 	}
 
-	mockPublisher := &MockPublisher{}
-	mockNotifier := &MockNotifier{}
+	mockPublisher := &mocks.MockPublisher{}
+	mockNotifier := &mocks.MockNotifier{}
 
 	processor := job.NewProcessor(mockAssistant, mockPublisher, mockNotifier, log.NewLogger())
 
@@ -153,9 +154,9 @@ func TestProcessor_Integration_MissingRequestID(t *testing.T) {
 	os.Unsetenv("REQUEST_ID")
 	defer os.Unsetenv("REQUEST_ID")
 
-	mockAssistant := &MockAssistant{}
-	mockPublisher := &MockPublisher{}
-	mockNotifier := &MockNotifier{}
+	mockAssistant := &mocks.MockAssistant{}
+	mockPublisher := &mocks.MockPublisher{}
+	mockNotifier := &mocks.MockNotifier{}
 
 	processor := job.NewProcessor(mockAssistant, mockPublisher, mockNotifier, log.NewLogger())
 
@@ -174,9 +175,9 @@ func TestProcessor_Integration_MissingRequestBody(t *testing.T) {
 		os.Unsetenv("REQUEST_BODY")
 	}()
 
-	mockAssistant := &MockAssistant{}
-	mockPublisher := &MockPublisher{}
-	mockNotifier := &MockNotifier{}
+	mockAssistant := &mocks.MockAssistant{}
+	mockPublisher := &mocks.MockPublisher{}
+	mockNotifier := &mocks.MockNotifier{}
 
 	processor := job.NewProcessor(mockAssistant, mockPublisher, mockNotifier, log.NewLogger())
 
@@ -207,20 +208,20 @@ func TestProcessor_Integration_PublisherError(t *testing.T) {
 		os.Unsetenv("CONTENT_TYPE")
 	}()
 
-	mockAssistant := &MockAssistant{
+	mockAssistant := &mocks.MockAssistant{
 		AskFunc: func(ctx context.Context, persona string, request string) (*string, error) {
 			response := "Generated content"
 			return &response, nil
 		},
 	}
 
-	mockPublisher := &MockPublisher{
+	mockPublisher := &mocks.MockPublisher{
 		PublishDocumentFunc: func(ctx context.Context, doc *models.Document) (*url.URL, error) {
 			return nil, context.DeadlineExceeded
 		},
 	}
 
-	mockNotifier := &MockNotifier{}
+	mockNotifier := &mocks.MockNotifier{}
 
 	processor := job.NewProcessor(mockAssistant, mockPublisher, mockNotifier, log.NewLogger())
 

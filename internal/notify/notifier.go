@@ -6,14 +6,14 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/schraf/assistant/internal/interfaces"
+	internal_models "github.com/schraf/assistant/internal/models"
 )
 
-// EmailNotifier implements interfaces.Notifier using SMTP email.
+// EmailNotifier implements internal_models.Notifier using SMTP email.
 type EmailNotifier struct{}
 
 // NewEmailNotifier creates a new EmailNotifier.
-func NewEmailNotifier() interfaces.Notifier {
+func NewEmailNotifier() internal_models.Notifier {
 	return &EmailNotifier{}
 }
 
