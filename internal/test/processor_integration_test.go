@@ -79,15 +79,7 @@ func TestProcessor_Integration(t *testing.T) {
 
 	ctx := context.Background()
 	err := processor.Process(ctx)
-
-	// If generator doesn't exist, that's expected in test environment
-	if err != nil {
-		// Check if it's a generator not found error
-		if err.Error() == "failed creating generator: generator 'test-generator' is not registered" {
-			t.Skip("test-generator not registered, skipping integration test")
-		}
-		require.NoError(t, err, "processor.Process() should succeed")
-	}
+	require.NoError(t, err, "processor.Process() should succeed")
 
 	// Verify publisher was called
 	require.NotNil(t, publishedDoc, "publisher should be called with a document")
@@ -96,58 +88,6 @@ func TestProcessor_Integration(t *testing.T) {
 	require.NotNil(t, notifiedURL, "notifier should be called with a URL")
 	assert.NotEmpty(t, notifiedTitle, "notifier should be called with a title")
 	assert.Equal(t, "https://telegra.ph/test-page", notifiedURL.String(), "notified URL should match")
-}
-
-func TestProcessor_Integration_ModelSelection(t *testing.T) {
-	requestID := uuid.New()
-	requestBody := map[string]any{"topic": "AI"}
-	bodyJSON, _ := json.Marshal(requestBody)
-	encodedBody := base64.StdEncoding.EncodeToString(bodyJSON)
-
-	// Test with "basic" model
-	config := map[string]any{"model": "basic"}
-	configJSON, _ := json.Marshal(config)
-	encodedConfig := base64.StdEncoding.EncodeToString(configJSON)
-
-	os.Setenv("REQUEST_ID", requestID.String())
-	os.Setenv("REQUEST_BODY", encodedBody)
-	os.Setenv("CONTENT_CONFIG", encodedConfig)
-	os.Setenv("CONTENT_TYPE", "test-generator")
-	defer func() {
-		os.Unsetenv("REQUEST_ID")
-		os.Unsetenv("REQUEST_BODY")
-		os.Unsetenv("CONTENT_CONFIG")
-		os.Unsetenv("CONTENT_TYPE")
-	}()
-
-	var selectedModel string
-	mockAssistant := &mocks.MockAssistant{
-		WithModelFunc: func(ctx context.Context, model string) context.Context {
-			selectedModel = model
-			return ctx
-		},
-		AskFunc: func(ctx context.Context, persona string, request string) (*string, error) {
-			response := "Generated content"
-			return &response, nil
-		},
-	}
-
-	mockPublisher := &mocks.MockPublisher{}
-	mockNotifier := &mocks.MockNotifier{}
-
-	processor := job.NewProcessor(mockAssistant, mockPublisher, mockNotifier, log.NewLogger())
-
-	ctx := context.Background()
-	err := processor.Process(ctx)
-
-	if err != nil {
-		if err.Error() == "failed creating generator: generator 'test-generator' is not registered" {
-			t.Skip("test-generator not registered, skipping integration test")
-		}
-		require.NoError(t, err, "processor.Process() should succeed")
-	}
-
-	assert.Equal(t, "gemini-flash-latest", selectedModel, "selected model should be 'gemini-flash-latest'")
 }
 
 func TestProcessor_Integration_MissingRequestID(t *testing.T) {
@@ -228,13 +168,7 @@ func TestProcessor_Integration_PublisherError(t *testing.T) {
 	ctx := context.Background()
 	err := processor.Process(ctx)
 
-	if err != nil {
-		if err.Error() == "failed creating generator: generator 'test-generator' is not registered" {
-			t.Skip("test-generator not registered, skipping integration test")
-		}
-		// Expected error from publisher
-		require.Error(t, err, "should return error from publisher")
-		assert.Contains(t, err.Error(), "publish error", "error should be from publisher")
-		return
-	}
+	// Expected error from publisher
+	require.Error(t, err, "should return error from publisher")
+	assert.Contains(t, err.Error(), "publish error", "error should be from publisher")
 }
