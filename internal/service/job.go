@@ -13,7 +13,7 @@ import (
 	"google.golang.org/api/option"
 )
 
-// CloudRunJobScheduler implements interfaces.JobScheduler using the Cloud Run Jobs API.
+// CloudRunJobScheduler implements models.JobScheduler using the Cloud Run Jobs API.
 type CloudRunJobScheduler struct{}
 
 // NewCloudRunJobScheduler creates a new CloudRunJobScheduler.
