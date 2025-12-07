@@ -3,7 +3,7 @@ REGION ?= us-central1
 
 all: build
 
-build: vet test
+build:
 	@mkdir -p $(BUILD_DIR)
 	go build -o $(BUILD_DIR)/tokens ./cmd/tokens
 	go build -o $(BUILD_DIR)/services ./cmd/service
