@@ -3,7 +3,9 @@ package gemini
 import (
 	"context"
 	"encoding/json"
+	"time"
 
+	"github.com/schraf/assistant/internal/retry"
 	"google.golang.org/genai"
 )
 
@@ -33,10 +35,7 @@ func (c *Client) Ask(ctx context.Context, persona string, request string) (*stri
 		},
 	}
 
-	model := modelFromContext(ctx)
-	prompt := genai.Text(request)
-
-	result, err := c.genaiClient.Models.GenerateContent(ctx, model, prompt, config)
+	result, err := c.generateContext(ctx, request, config)
 	if err != nil {
 		return nil, err
 	}
@@ -52,10 +51,7 @@ func (c *Client) StructuredAsk(ctx context.Context, persona string, request stri
 		SystemInstruction:  genai.NewContentFromText(persona, genai.RoleModel),
 	}
 
-	model := modelFromContext(ctx)
-	prompt := genai.Text(request)
-
-	result, err := c.genaiClient.Models.GenerateContent(ctx, model, prompt, config)
+	result, err := c.generateContext(ctx, request, config)
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +66,31 @@ func (c *Client) StructuredAsk(ctx context.Context, persona string, request stri
 	}
 
 	return responseJson, nil
+}
+
+func (c *Client) generateContext(ctx context.Context, request string, cfg *genai.GenerateContentConfig) (*genai.GenerateContentResponse, error) {
+	var result *genai.GenerateContentResponse
+
+	model := modelFromContext(ctx)
+	prompt := genai.Text(request)
+
+	retryable := retry.Retryer{
+		MaxRetries:       3,
+		InitialBackoff:   1 * time.Second,
+		MaxBackoff:       30 * time.Second,
+		IsRetryableError: func(error) bool { return true },
+		Attempt: func(ctx context.Context) error {
+			var err error
+			result, err = c.genaiClient.Models.GenerateContent(ctx, model, prompt, cfg)
+			return err
+		},
+	}
+
+	if err := retryable.Try(ctx); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 // WithModel returns a context with the specified model set.
