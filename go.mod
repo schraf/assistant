@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	cloud.google.com/go/run v1.12.1
 	github.com/google/uuid v1.6.0
-	github.com/schraf/newspaper-assistant v1.0.1
+	github.com/schraf/newspaper-assistant v1.0.2
 	github.com/schraf/research-assistant v1.0.5
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/api v0.256.0

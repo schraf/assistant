@@ -51,10 +51,21 @@ func (p *Publisher) PublishDocument(ctx context.Context, doc *models.Document) (
 
 	returnContent := false
 
+	// Use author from doc, or fall back to environment variable if blank
+	authorName := doc.Author
+	if authorName == "" {
+		authorName = os.Getenv("TELEGRAPH_AUTHOR_NAME")
+	}
+
+	var authorNamePtr *string
+	if authorName != "" {
+		authorNamePtr = &authorName
+	}
+
 	pageRequest := CreatePageRequest{
 		AccessToken:   apiToken,
 		Title:         doc.Title,
-		AuthorName:    &doc.Author,
+		AuthorName:    authorNamePtr,
 		Content:       content,
 		ReturnContent: &returnContent,
 	}
