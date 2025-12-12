@@ -39,6 +39,7 @@ func Evaluate(ctx context.Context, generator models.ContentGenerator, request mo
 		return fmt.Errorf("failed generating content: %w", err)
 	}
 
+	length := 0
 	now := time.Now()
 	layout := "January 2, 2006"
 	dateString := now.Format(layout)
@@ -50,9 +51,11 @@ func Evaluate(ctx context.Context, generator models.ContentGenerator, request mo
 		fmt.Println("## " + section.Title)
 
 		for _, paragraph := range section.Paragraphs {
+			length += len(paragraph)
 			fmt.Println(paragraph + "\n")
 		}
 	}
 
+	fmt.Printf("\n--- %d characters\n", length)
 	return nil
 }

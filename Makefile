@@ -1,7 +1,7 @@
 BUILD_DIR=bin
 REGION ?= us-central1
 
-all: build
+all: deps vet test build
 
 build:
 	@mkdir -p $(BUILD_DIR)

@@ -52,8 +52,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR38lUII=
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
-github.com/schraf/newspaper-assistant v1.0.3 h1:+SPResVxULd7WLVRAbC+mNezO7zh5TX5j12i8E2C6P0=
-github.com/schraf/newspaper-assistant v1.0.3/go.mod h1:sFE5D6LCRnKy4Pc3m+n3iJ+Bmn6l7X/hdTj8eqg/ckQ=
+github.com/schraf/newspaper-assistant v1.0.4 h1:sMhl4/j/bawynTR9b0vForVstsUKA+m1OMlEeGtRsC4=
+github.com/schraf/newspaper-assistant v1.0.4/go.mod h1:sFE5D6LCRnKy4Pc3m+n3iJ+Bmn6l7X/hdTj8eqg/ckQ=
 github.com/schraf/research-assistant v1.0.5 h1:1dRkkqeihMS71+BnQr9mi3aYDgnZQU/Su/gOgdRuYz4=
 github.com/schraf/research-assistant v1.0.5/go.mod h1:WeLxsmtN2TfDzpcqigTHeVw7Z6vwLKebjXEgy5As7k0=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
