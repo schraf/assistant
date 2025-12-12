@@ -114,10 +114,19 @@ func (p *Processor) Process(ctx context.Context) error {
 		return fmt.Errorf("content generation error: %w", err)
 	}
 
+	length := 0
+
+	for _, section := range doc.Sections {
+		for _, paragraph := range section.Paragraphs {
+			length += len(paragraph)
+		}
+	}
+
 	logger.InfoContext(ctx, "generated_document",
 		slog.String("title", doc.Title),
 		slog.String("author", doc.Author),
 		slog.Int("section_count", len(doc.Sections)),
+		slog.Int("content_length", length),
 	)
 
 	//--========================================================================--
