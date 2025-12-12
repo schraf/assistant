@@ -56,7 +56,7 @@ func TestCleanMarkdown(t *testing.T) {
 		{
 			name:     "header",
 			input:    "# Header 1\n## Header 2",
-			expected: "Header 1\nHeader 2",
+			expected: "",
 		},
 		{
 			name:     "list",
@@ -81,7 +81,7 @@ func TestCleanMarkdown(t *testing.T) {
 		{
 			name:     "combined formatting",
 			input:    "# Title\n\nThis is **bold** and *italic* text with a [link](url).",
-			expected: "Title\n\nThis is bold and italic text with a link.",
+			expected: "This is bold and italic text with a link.",
 		},
 		{
 			name:     "multiple newlines",
@@ -97,6 +97,26 @@ func TestCleanMarkdown(t *testing.T) {
 			name:     "plain text",
 			input:    "Just plain text",
 			expected: "Just plain text",
+		},
+		{
+			name:     "header with text before and after",
+			input:    "Text before\n# Header\nText after",
+			expected: "Text before\n\nText after",
+		},
+		{
+			name:     "multiple headers",
+			input:    "# Header 1\nSome content\n## Header 2\nMore content\n### Header 3",
+			expected: "Some content\n\nMore content",
+		},
+		{
+			name:     "header with six hashes",
+			input:    "###### Header 6",
+			expected: "",
+		},
+		{
+			name:     "header with content",
+			input:    "# Section Title\n\nThis is paragraph text.",
+			expected: "This is paragraph text.",
 		},
 	}
 

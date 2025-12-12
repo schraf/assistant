@@ -13,7 +13,7 @@ import (
 // - Inline code (`text`)
 // - Links ([text](url) -> text)
 // - Images (![alt](url) -> alt)
-// - Headers (# Header -> Header)
+// - Headers (entire lines starting with # are removed)
 // - List markers (-, *, +, numbered)
 // - Blockquotes (> text -> text)
 // - Horizontal rules (---, ***)
@@ -60,9 +60,9 @@ func CleanMarkdown(text string) string {
 	italicUnderscorePattern := regexp.MustCompile("_([^_\\n]+)_")
 	result = italicUnderscorePattern.ReplaceAllString(result, "$1")
 
-	// Remove headers (# Header -> Header)
-	headerPattern := regexp.MustCompile("(?m)^#{1,6}\\s+(.+)$")
-	result = headerPattern.ReplaceAllString(result, "$1")
+	// Remove headers (entire lines starting with #)
+	headerPattern := regexp.MustCompile("(?m)^#{1,}.*$")
+	result = headerPattern.ReplaceAllString(result, "")
 
 	// Remove horizontal rules (---, ***, ___)
 	horizontalRulePattern := regexp.MustCompile("(?m)^[-*_]{3,}\\s*$")

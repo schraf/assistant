@@ -66,7 +66,7 @@ func TestCleanText(t *testing.T) {
 		{
 			name:     "markdown headers",
 			input:    "# Header 1\n## Header 2",
-			expected: "Header 1Header 2",
+			expected: "",
 		},
 		{
 			name:     "html headers",
