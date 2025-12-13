@@ -90,8 +90,13 @@ func TestCleanLaTeX(t *testing.T) {
 		},
 		{
 			name:     "comment",
-			input:    "Text % this is a comment\nMore text",
-			expected: "Text\nMore text",
+			input:    "% this is a comment\nMore text",
+			expected: "More text",
+		},
+		{
+			name:     "percent in text preserved",
+			input:    "Text with 50% content",
+			expected: "Text with 50% content",
 		},
 		{
 			name:     "combined formatting",
