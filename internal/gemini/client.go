@@ -6,14 +6,21 @@ import (
 	"time"
 
 	"github.com/schraf/assistant/internal/retry"
+	"github.com/schraf/syncext"
 	"google.golang.org/genai"
 )
 
 type Client struct {
 	genaiClient *genai.Client
+	semaphore   *syncext.Semaphore
 }
 
-func NewClient(ctx context.Context) (*Client, error) {
+func NewClient(ctx context.Context, concurrency int) (*Client, error) {
+	sem, err := syncext.NewSemaphore(concurrency)
+	if err != nil {
+		return nil, err
+	}
+
 	genaiClient, err := genai.NewClient(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -21,10 +28,16 @@ func NewClient(ctx context.Context) (*Client, error) {
 
 	return &Client{
 		genaiClient: genaiClient,
+		semaphore:   sem,
 	}, nil
 }
 
 func (c *Client) Ask(ctx context.Context, persona string, request string) (*string, error) {
+	if err := c.semaphore.Acquire(ctx); err != nil {
+		return nil, err
+	}
+	defer c.semaphore.Release()
+
 	config := &genai.GenerateContentConfig{
 		SystemInstruction: genai.NewContentFromText(persona, genai.RoleModel),
 		Tools: []*genai.Tool{
@@ -45,6 +58,11 @@ func (c *Client) Ask(ctx context.Context, persona string, request string) (*stri
 }
 
 func (c *Client) StructuredAsk(ctx context.Context, persona string, request string, schema map[string]any) (json.RawMessage, error) {
+	if err := c.semaphore.Acquire(ctx); err != nil {
+		return nil, err
+	}
+	defer c.semaphore.Release()
+
 	config := &genai.GenerateContentConfig{
 		ResponseMIMEType:   "application/json",
 		ResponseJsonSchema: schema,

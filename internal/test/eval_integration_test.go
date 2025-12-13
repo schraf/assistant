@@ -61,7 +61,7 @@ func TestEvaluate_Integration(t *testing.T) {
 	ctx := context.Background()
 	model := "mock-model"
 
-	err := eval.Evaluate(ctx, generator, request, model)
+	err := eval.Evaluate(ctx, generator, request, &model)
 	require.NoError(t, err, "Evaluate should succeed")
 
 	// Verify generator was called correctly
@@ -93,7 +93,7 @@ func TestEvaluate_Integration_UnknownProvider(t *testing.T) {
 	ctx := context.Background()
 	model := "unknown-model"
 
-	err := eval.Evaluate(ctx, generator, request, model)
+	err := eval.Evaluate(ctx, generator, request, &model)
 
 	require.Error(t, err, "Evaluate should return error for unknown provider")
 	assert.Contains(t, err.Error(), "failed creating assistant client", "error should mention assistant client creation")
@@ -127,7 +127,7 @@ func TestEvaluate_Integration_GeneratorError(t *testing.T) {
 	ctx := context.Background()
 	model := "mock-model"
 
-	err := eval.Evaluate(ctx, generator, request, model)
+	err := eval.Evaluate(ctx, generator, request, &model)
 	require.Error(t, err, "Evaluate should return error when generator fails")
 	assert.Contains(t, err.Error(), "failed generating content", "error should mention content generation failure")
 }

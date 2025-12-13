@@ -21,19 +21,22 @@ func newAssistant(ctx context.Context) (models.Assistant, error) {
 	case "ollama":
 		return ollama.NewClient(ctx)
 	case "gemini", "":
-		return gemini.NewClient(ctx)
+		return gemini.NewClient(ctx, 3)
 	default:
 		return nil, fmt.Errorf("unknown assistant provider: %s", provider)
 	}
 }
 
-func Evaluate(ctx context.Context, generator models.ContentGenerator, request models.ContentRequest, model string) error {
+func Evaluate(ctx context.Context, generator models.ContentGenerator, request models.ContentRequest, model *string) error {
 	assistant, err := newAssistant(ctx)
 	if err != nil {
 		return fmt.Errorf("failed creating assistant client: %w", err)
 	}
 
-	ctx = assistant.WithModel(ctx, model)
+	if model != nil {
+		ctx = assistant.WithModel(ctx, *model)
+	}
+
 	doc, err := generator.Generate(ctx, request, assistant)
 	if err != nil {
 		return fmt.Errorf("failed generating content: %w", err)
