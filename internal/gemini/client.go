@@ -3,11 +3,15 @@ package gemini
 import (
 	"context"
 	"encoding/json"
+	"net/http"
 	"time"
 
 	"github.com/schraf/assistant/internal/retry"
+	"github.com/schraf/assistant/pkg/models"
 	"github.com/schraf/syncext"
 	"google.golang.org/genai"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Client struct {
@@ -53,6 +57,10 @@ func (c *Client) Ask(ctx context.Context, persona string, request string) (*stri
 		return nil, err
 	}
 
+	if result.PromptFeedback != nil {
+		return nil, models.ErrContentBlocked
+	}
+
 	responseText := result.Text()
 	return &responseText, nil
 }
@@ -72,6 +80,10 @@ func (c *Client) StructuredAsk(ctx context.Context, persona string, request stri
 	result, err := c.generateContext(ctx, request, config)
 	if err != nil {
 		return nil, err
+	}
+
+	if result.PromptFeedback != nil {
+		return nil, models.ErrContentBlocked
 	}
 
 	responseText := result.Text()
@@ -96,7 +108,7 @@ func (c *Client) generateContext(ctx context.Context, request string, cfg *genai
 		MaxRetries:       3,
 		InitialBackoff:   1 * time.Second,
 		MaxBackoff:       30 * time.Second,
-		IsRetryableError: func(error) bool { return true },
+		IsRetryableError: isRateLimitError,
 		Attempt: func(ctx context.Context) error {
 			var err error
 			result, err = c.genaiClient.Models.GenerateContent(ctx, model, prompt, cfg)
@@ -114,4 +126,20 @@ func (c *Client) generateContext(ctx context.Context, request string, cfg *genai
 // WithModel returns a context with the specified model set.
 func (c *Client) WithModel(ctx context.Context, model string) context.Context {
 	return context.WithValue(ctx, modelKey, model)
+}
+
+func isRateLimitError(err error) bool {
+	if apiErr, ok := err.(interface {
+		HTTPCode() int
+	}); ok && apiErr.HTTPCode() == http.StatusTooManyRequests {
+		return true
+	}
+
+	if st, ok := status.FromError(err); ok {
+		if st.Code() == codes.ResourceExhausted {
+			return true
+		}
+	}
+
+	return false
 }
