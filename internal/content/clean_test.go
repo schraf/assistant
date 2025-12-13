@@ -83,6 +83,11 @@ func TestCleanText(t *testing.T) {
 			input:    "**Bold**\n<em>Italic</em>\t\\textbf{LaTeX}",
 			expected: "BoldItalic LaTeX",
 		},
+		{
+			name:     "preserve special characters",
+			input:    `Text with "quotes" and 'apostrophes' and ? ! $ % & ( ) + = - characters`,
+			expected: `Text with "quotes" and 'apostrophes' and ? ! $ % & ( ) + = - characters`,
+		},
 	}
 
 	for _, tt := range tests {

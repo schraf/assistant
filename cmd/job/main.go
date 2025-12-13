@@ -28,7 +28,7 @@ func main() {
 	}
 
 	// Create assistant
-	assistant, err := gemini.NewClient(ctx)
+	assistant, err := gemini.NewClient(ctx, 3)
 	if err != nil {
 		logger.ErrorContext(ctx, "failed_creating_assistant",
 			slog.String("error", err.Error()),

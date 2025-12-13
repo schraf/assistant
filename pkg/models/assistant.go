@@ -3,6 +3,11 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"errors"
+)
+
+var (
+	ErrContentBlocked = errors.New("content blocked")
 )
 
 type Assistant interface {

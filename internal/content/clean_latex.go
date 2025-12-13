@@ -22,9 +22,16 @@ func CleanLaTeX(text string) string {
 	result := text
 
 	// Remove comments (% comment, but not \% escaped percent)
-	// Match % and everything after it on the line, but keep text before %
-	commentPattern := regexp.MustCompile("(?m)([^%\\\\]*(?:\\\\.[^%\\\\]*)*)%[^\n]*")
-	result = commentPattern.ReplaceAllString(result, "$1")
+	// Only remove % when it's at the very start of a line (with optional whitespace)
+	// This preserves % in regular text content while still removing LaTeX comments
+	// First, preserve escaped % by replacing with placeholder
+	escapedPercentPlaceholder := "___ESCAPED_PERCENT___"
+	result = strings.ReplaceAll(result, "\\%", escapedPercentPlaceholder)
+	// Remove % only at start of line (with optional leading whitespace)
+	commentPattern := regexp.MustCompile("(?m)^[ \t]*%[^\n]*")
+	result = commentPattern.ReplaceAllString(result, "")
+	// Restore escaped %
+	result = strings.ReplaceAll(result, escapedPercentPlaceholder, "%")
 
 	// Remove math mode (inline and display)
 	// Use a placeholder that will be replaced with double space after space cleanup
