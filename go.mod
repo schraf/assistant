@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	cloud.google.com/go/run v1.12.1
 	github.com/google/uuid v1.6.0
-	github.com/schraf/newspaper-assistant v1.0.6
+	github.com/schraf/newspaper-assistant v1.0.7
 	github.com/schraf/research-assistant v1.0.7
 	github.com/schraf/syncext v1.0.1
 	github.com/stretchr/testify v1.11.1
@@ -40,7 +40,7 @@ require (
 	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/oauth2 v0.33.0 // indirect
-	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/text v0.30.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
