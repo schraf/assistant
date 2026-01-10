@@ -52,8 +52,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR38lUII=
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
-github.com/schraf/newspaper-assistant v1.0.7 h1:E1uqHm6iEiB3akuxRLTrgZ0MIBqJKGHwgt4gvuGb2YA=
-github.com/schraf/newspaper-assistant v1.0.7/go.mod h1:CsiPORB4d5UvLQhO2pwsYzo2dmtJc9ASxo/Aufaan+g=
+github.com/schraf/newspaper-assistant v1.1.0 h1:AgyNqqSNjP1zQXhH+j2eLibwPhZOSb2qjg4UG77Cu50=
+github.com/schraf/newspaper-assistant v1.1.0/go.mod h1:CsiPORB4d5UvLQhO2pwsYzo2dmtJc9ASxo/Aufaan+g=
 github.com/schraf/pipeline v1.4.0 h1:ZXtkW6DJMt8RlSuWJMSNo6XFlmImBT6pxMIgaFNrbFE=
 github.com/schraf/pipeline v1.4.0/go.mod h1:t8Yb1Tbual4H1++YdM/Y5AlxUnjWCqAYnM62/m3/Azc=
 github.com/schraf/research-assistant v1.0.7 h1:t7HcKkplDS+7k9/yDkBlVIvt3iXdDM0LSEU8Cr3mT94=
