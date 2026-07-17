@@ -1,4 +1,4 @@
-package service
+package gcp
 
 import (
 	"context"
@@ -13,15 +13,12 @@ import (
 	"google.golang.org/api/option"
 )
 
-// CloudRunJobScheduler implements models.JobScheduler using the Cloud Run Jobs API.
 type CloudRunJobScheduler struct{}
 
-// NewCloudRunJobScheduler creates a new CloudRunJobScheduler.
 func NewCloudRunJobScheduler() *CloudRunJobScheduler {
 	return &CloudRunJobScheduler{}
 }
 
-// ScheduleJob schedules a Cloud Run job with the given content type, config, and request.
 func (s *CloudRunJobScheduler) ScheduleJob(ctx context.Context, contentType string, config map[string]any, request models.ContentRequest) error {
 	//--==================================================================--
 	//--== READ ENVIRONMENT VARIABLES

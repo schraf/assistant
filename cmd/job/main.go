@@ -9,8 +9,8 @@ import (
 	"github.com/schraf/assistant/internal/gemini"
 	"github.com/schraf/assistant/internal/job"
 	"github.com/schraf/assistant/internal/log"
-	"github.com/schraf/assistant/internal/notify"
-	"github.com/schraf/assistant/internal/telegraph"
+	"github.com/schraf/assistant/internal/notify/email"
+	"github.com/schraf/assistant/internal/publish/telegraph"
 	_ "github.com/schraf/newspaper-assistant/pkg/generator"
 	_ "github.com/schraf/research-assistant/pkg/generator"
 )
@@ -38,7 +38,7 @@ func main() {
 
 	// Create dependencies
 	publisher := telegraph.NewPublisher()
-	notifier := notify.NewEmailNotifier()
+	notifier := email.NewEmailNotifier()
 
 	// Create processor
 	processor := job.NewProcessor(assistant, publisher, notifier, logger)

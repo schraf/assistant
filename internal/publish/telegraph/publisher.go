@@ -6,17 +6,15 @@ import (
 	"net/url"
 	"os"
 
-	internal_models "github.com/schraf/assistant/internal/models"
 	"github.com/schraf/assistant/pkg/models"
 )
 
-// Publisher implements internal_models.Publisher using the Telegraph API.
 type Publisher struct {
 	client Client
 }
 
 // NewPublisher creates a new Publisher.
-func NewPublisher() internal_models.Publisher {
+func NewPublisher() *Publisher {
 	return &Publisher{
 		client: NewDefaultClient(),
 	}

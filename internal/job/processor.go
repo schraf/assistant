@@ -9,7 +9,8 @@ import (
 	"os"
 
 	"github.com/google/uuid"
-	internal_models "github.com/schraf/assistant/internal/models"
+	"github.com/schraf/assistant/internal/notify"
+	"github.com/schraf/assistant/internal/publish"
 	"github.com/schraf/assistant/pkg/generators"
 	"github.com/schraf/assistant/pkg/models"
 )
@@ -17,13 +18,13 @@ import (
 // Processor handles the job processing workflow.
 type Processor struct {
 	assistant models.Assistant
-	publisher internal_models.Publisher
-	notifier  internal_models.Notifier
+	publisher publish.Publisher
+	notifier  notify.Notifier
 	logger    *slog.Logger
 }
 
 // NewProcessor creates a new Processor with the given dependencies.
-func NewProcessor(assistant models.Assistant, publisher internal_models.Publisher, notifier internal_models.Notifier, logger *slog.Logger) *Processor {
+func NewProcessor(assistant models.Assistant, publisher publish.Publisher, notifier notify.Notifier, logger *slog.Logger) *Processor {
 	return &Processor{
 		assistant: assistant,
 		publisher: publisher,

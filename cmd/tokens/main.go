@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/schraf/assistant/internal/config"
-	"github.com/schraf/assistant/internal/telegraph"
+	"github.com/schraf/assistant/internal/publish/telegraph"
 )
 
 func main() {
