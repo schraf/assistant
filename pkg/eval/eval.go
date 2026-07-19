@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/schraf/assistant/internal/gemini"
+	"github.com/schraf/assistant/internal/assistant/gemini"
+	"github.com/schraf/assistant/internal/assistant/ollama"
 	"github.com/schraf/assistant/internal/mocks"
-	"github.com/schraf/assistant/internal/ollama"
 	"github.com/schraf/assistant/pkg/models"
 )
 

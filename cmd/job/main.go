@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/schraf/assistant/internal/assistant/gemini"
 	"github.com/schraf/assistant/internal/config"
-	"github.com/schraf/assistant/internal/gemini"
 	"github.com/schraf/assistant/internal/job"
 	"github.com/schraf/assistant/internal/log"
 	"github.com/schraf/assistant/internal/notify/email"
