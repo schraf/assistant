@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const maxOutputTokens = int32(8192)
+const maxOutputTokens = int32(32_000)
 
 type Client struct {
 	genaiClient *genai.Client
