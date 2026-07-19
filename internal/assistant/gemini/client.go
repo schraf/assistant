@@ -14,6 +14,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const maxOutputTokens = int32(8192)
+
 type Client struct {
 	genaiClient *genai.Client
 	semaphore   *syncext.Semaphore
@@ -44,6 +46,7 @@ func (c *Client) Ask(ctx context.Context, persona string, request string) (*stri
 
 	config := &genai.GenerateContentConfig{
 		SystemInstruction: genai.NewContentFromText(persona, genai.RoleModel),
+		MaxOutputTokens:   maxOutputTokens,
 		Tools: []*genai.Tool{
 			{
 				GoogleSearch: &genai.GoogleSearch{},
@@ -72,6 +75,7 @@ func (c *Client) StructuredAsk(ctx context.Context, persona string, request stri
 	defer c.semaphore.Release()
 
 	config := &genai.GenerateContentConfig{
+		MaxOutputTokens:    maxOutputTokens,
 		ResponseMIMEType:   "application/json",
 		ResponseJsonSchema: schema,
 		SystemInstruction:  genai.NewContentFromText(persona, genai.RoleModel),

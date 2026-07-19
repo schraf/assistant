@@ -10,7 +10,7 @@ require (
 	github.com/schraf/syncext v1.0.1
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/api v0.256.0
-	google.golang.org/genai v1.36.0
+	google.golang.org/genai v1.64.0
 	google.golang.org/grpc v1.76.0
 )
 
