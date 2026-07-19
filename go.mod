@@ -1,11 +1,10 @@
 module github.com/schraf/assistant
 
-go 1.24.0
+go 1.26.1
 
 require (
 	cloud.google.com/go/run v1.12.1
 	github.com/google/uuid v1.6.0
-	github.com/schraf/newspaper-assistant v1.1.1
 	github.com/schraf/research-assistant v1.0.7
 	github.com/schraf/syncext v1.0.1
 	github.com/stretchr/testify v1.11.1
@@ -31,7 +30,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/schraf/pipeline v1.4.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.61.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.61.0 // indirect

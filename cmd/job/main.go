@@ -11,7 +11,6 @@ import (
 	"github.com/schraf/assistant/internal/log"
 	"github.com/schraf/assistant/internal/notify/email"
 	"github.com/schraf/assistant/internal/publish/telegraph"
-	_ "github.com/schraf/newspaper-assistant/pkg/generator"
 	_ "github.com/schraf/research-assistant/pkg/generator"
 )
 
