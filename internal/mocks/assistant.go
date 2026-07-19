@@ -4,13 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
+	"github.com/schraf/assistant/pkg/models"
 )
 
 // MockAssistant is a mock implementation of models.Assistant.
 type MockAssistant struct {
 	AskFunc           func(ctx context.Context, persona string, request string) (*string, error)
 	StructuredAskFunc func(ctx context.Context, persona string, request string, schema map[string]any) (json.RawMessage, error)
-	WithModelFunc     func(ctx context.Context, model string) context.Context
+	WithModelFunc     func(ctx context.Context, model models.ModelType) context.Context
 }
 
 // Ask calls AskFunc if set, otherwise returns a mock response.
@@ -132,7 +134,7 @@ func generateArrayFromSchema(schema map[string]any) []any {
 }
 
 // WithModel calls WithModelFunc if set, otherwise returns the context unchanged.
-func (m *MockAssistant) WithModel(ctx context.Context, model string) context.Context {
+func (m *MockAssistant) WithModel(ctx context.Context, model models.ModelType) context.Context {
 	if m.WithModelFunc != nil {
 		return m.WithModelFunc(ctx, model)
 	}

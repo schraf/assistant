@@ -59,7 +59,7 @@ func TestEvaluate_Integration(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	model := "mock-model"
+	model := models.ModelLite
 
 	err := eval.Evaluate(ctx, generator, request, &model)
 	require.NoError(t, err, "Evaluate should succeed")
@@ -91,7 +91,7 @@ func TestEvaluate_Integration_UnknownProvider(t *testing.T) {
 	generator := &mocks.MockContentGenerator{}
 
 	ctx := context.Background()
-	model := "unknown-model"
+	model := models.ModelLite
 
 	err := eval.Evaluate(ctx, generator, request, &model)
 
@@ -125,7 +125,7 @@ func TestEvaluate_Integration_GeneratorError(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	model := "mock-model"
+	model := models.ModelLite
 
 	err := eval.Evaluate(ctx, generator, request, &model)
 	require.Error(t, err, "Evaluate should return error when generator fails")

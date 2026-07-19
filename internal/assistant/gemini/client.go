@@ -127,8 +127,7 @@ func (c *Client) generateContext(ctx context.Context, request string, cfg *genai
 	return result, nil
 }
 
-// WithModel returns a context with the specified model set.
-func (c *Client) WithModel(ctx context.Context, model string) context.Context {
+func (c *Client) WithModel(ctx context.Context, model models.ModelType) context.Context {
 	return context.WithValue(ctx, modelKey, model)
 }
 

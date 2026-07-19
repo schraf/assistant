@@ -1,17 +1,24 @@
 package gemini
 
-import "context"
+import (
+	"context"
+
+	"github.com/schraf/assistant/pkg/models"
+)
 
 type contextKey struct{}
 
 var modelKey contextKey
 
-const defaultModel = "gemini-flash-latest"
+const defaultLiteModel = "gemini-flash-latest"
+const defaultDeepModel = "gemini-pro-latest"
 
 func modelFromContext(ctx context.Context) string {
-	if model, ok := ctx.Value(modelKey).(string); ok {
-		return model
+	if modelType, ok := ctx.Value(modelKey).(models.ModelType); ok {
+		if modelType == models.ModelDeep {
+			return defaultDeepModel
+		}
 	}
 
-	return defaultModel
+	return defaultLiteModel
 }

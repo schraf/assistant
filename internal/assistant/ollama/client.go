@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/schraf/assistant/pkg/models"
 )
 
 type Client struct {
@@ -174,6 +176,6 @@ func (c *Client) StructuredAsk(ctx context.Context, persona string, request stri
 }
 
 // WithModel returns a context with the specified model set.
-func (c *Client) WithModel(ctx context.Context, model string) context.Context {
+func (c *Client) WithModel(ctx context.Context, model models.ModelType) context.Context {
 	return context.WithValue(ctx, modelKey, model)
 }

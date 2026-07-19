@@ -75,22 +75,14 @@ func (p *Processor) Process(ctx context.Context) error {
 	//--== APPLY MODEL SELECTION
 	//--========================================================================--
 
+	modelType := models.ModelLite
+
 	if model, ok := (*config)["model"].(string); ok {
-		var modelName string
-		if model == "pro" {
-			modelName = "gemini-pro-latest"
-		} else if model == "basic" {
-			modelName = "gemini-flash-latest"
-		} else {
-			// For other assistants (like Ollama), use the model name directly
-			modelName = model
+		if model == "pro" || model == "deep" {
+			modelType = models.ModelDeep
 		}
 
-		ctx = p.assistant.WithModel(ctx, modelName)
-
-		logger.InfoContext(ctx, "using_model",
-			slog.String("model", modelName),
-		)
+		ctx = p.assistant.WithModel(ctx, modelType)
 	}
 
 	//--========================================================================--

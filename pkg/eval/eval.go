@@ -27,7 +27,7 @@ func newAssistant(ctx context.Context) (models.Assistant, error) {
 	}
 }
 
-func Evaluate(ctx context.Context, generator models.ContentGenerator, request models.ContentRequest, model *string) error {
+func Evaluate(ctx context.Context, generator models.ContentGenerator, request models.ContentRequest, model *models.ModelType) error {
 	assistant, err := newAssistant(ctx)
 	if err != nil {
 		return fmt.Errorf("failed creating assistant client: %w", err)

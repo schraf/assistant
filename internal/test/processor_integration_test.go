@@ -41,8 +41,8 @@ func TestProcessor_Integration(t *testing.T) {
 
 	// Create mocks
 	mockAssistant := &mocks.MockAssistant{
-		WithModelFunc: func(ctx context.Context, model string) context.Context {
-			assert.Equal(t, "gemini-pro-latest", model, "model should be 'gemini-pro-latest'")
+		WithModelFunc: func(ctx context.Context, model models.ModelType) context.Context {
+			assert.Equal(t, models.ModelDeep, model, "model should be deep")
 			return ctx
 		},
 		AskFunc: func(ctx context.Context, persona string, request string) (*string, error) {
