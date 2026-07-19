@@ -1,6 +1,8 @@
 package models
 
-import "github.com/schraf/assistant/internal/content"
+import (
+	"github.com/schraf/assistant/internal/content"
+)
 
 type DocumentSection struct {
 	Title      string   `json:"title"`
@@ -47,5 +49,40 @@ func (d *Document) Clean() {
 		for j := range d.Sections[i].Paragraphs {
 			d.Sections[i].Paragraphs[j] = content.CleanText(d.Sections[i].Paragraphs[j])
 		}
+	}
+}
+
+func DocumentSchema() map[string]any {
+	return map[string]any{
+		"type": "object",
+		"properties": map[string]any{
+			"title": map[string]any{
+				"type":        "string",
+				"description": "The comprehensive title of the macro research report.",
+			},
+			"sections": map[string]any{
+				"type":        "array",
+				"description": "The structural body chapters detailing deep subtopic discoveries.",
+				"items": map[string]any{
+					"type": "object",
+					"properties": map[string]any{
+						"title": map[string]any{
+							"type":        "string",
+							"description": "The chapter or subtopic title header.",
+						},
+						"paragraphs": map[string]any{
+							"type":        "array",
+							"description": "The list of paragraphs for a single section",
+							"items": map[string]any{
+								"type":        "string",
+								"description": "An exhaustive, highly detailed narrative paragraph containing at least 250-400 words of granular analysis, data points, and explicit facts. Do NOT summarize or condense the researcher's raw data.",
+							},
+						},
+					},
+					"required": []string{"title", "paragraphs"},
+				},
+			},
+		},
+		"required": []string{"title", "sections"},
 	}
 }
